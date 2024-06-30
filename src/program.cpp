@@ -1,19 +1,13 @@
 #include <iostream>
-#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <other/Square.hpp>
 
 using namespace std;
 
-struct Square {
-    float pos_x;
-    float pos_y;
-    float t;
-};
-
 static double cursor_x;
 static double cursor_y;
-static vector<Square> squares;
+vector<Square> squares_array;
 
 const char* vertexShaderSource = R"(
 #version 330 core
@@ -75,59 +69,7 @@ GLuint createShaderProgram() {
     return shaderProgram;
 }
 
-float v0 = 0;
-
-void Draw_Square_Falling(const float ratio, GLuint VAO, GLuint VBO, float square_side_length, float& pos_x, float& pos_y, float& t) {
-
-    float g = -0.2;
-
-    float v = v0 + g*t;
-
-    float vertex_point = square_side_length/2;
-    float vertex_limit_point_x = 1-(vertex_point/ratio);
-    float vertex_limit_point_y = 1-vertex_point;
-
-    float bottom_vertex_y = -vertex_point+v*t+1/2*g*t*t+pos_y;
-    float top_vertex_y = vertex_point+v*t+1/2*g*t*t+pos_y;
-
-    float left_vertex_x = -vertex_point/ratio+pos_x;
-    float right_vertex_x = vertex_point/ratio+pos_x;
-
-    if (bottom_vertex_y<=-vertex_point-vertex_limit_point_y) {
-        bottom_vertex_y=-vertex_point-vertex_limit_point_y;
-        top_vertex_y=bottom_vertex_y+square_side_length;
-    }
-    
-    GLfloat vertices[] = {
-        left_vertex_x, bottom_vertex_y, 0.0f, // Bottom-left
-        right_vertex_x, bottom_vertex_y, 0.0f,  // Bottom-right
-        right_vertex_x, top_vertex_y, 0.0f,   // Top-right
-        left_vertex_x, top_vertex_y, 0.0f   // Top-left
-    };
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
-void Draw_Square_on_cursor(const float ratio, GLuint VAO, GLuint VBO, float square_side_length, float normalized_cursor_x, float normalized_cursor_y) {
-
-    float vertex_point = square_side_length/2;
-
-    GLfloat vertices[] = {
-        -vertex_point/ratio+normalized_cursor_x, -vertex_point+normalized_cursor_y, 0.0f, // Bottom-left
-        vertex_point/ratio+normalized_cursor_x, -vertex_point+normalized_cursor_y, 0.0f,  // Bottom-right
-        vertex_point/ratio+normalized_cursor_x, vertex_point+normalized_cursor_y, 0.0f,   // Top-right
-        -vertex_point/ratio+normalized_cursor_x, vertex_point+normalized_cursor_y, 0.0f   // Top-left
-    };
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-}
-
 int main() {
-
     if (!glfwInit()) {
         cout << "Failed to initialize GLFW" << endl;
         return -1;
@@ -145,7 +87,7 @@ int main() {
         glfwTerminate();
         return -1;
     }
-    
+
     glfwMakeContextCurrent(window);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -180,6 +122,9 @@ int main() {
 
     double lastTime = glfwGetTime();
 
+    vector<Square> squares_array;
+    Square sq(0.0f,0.0f,0.0f);
+
     while (!glfwWindowShouldClose(window)) {
 
         double currentTime = glfwGetTime();
@@ -188,7 +133,7 @@ int main() {
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
-        const float ratio = width/(float)height;
+        const float ratio = width / (float)height;
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
@@ -197,28 +142,32 @@ int main() {
 
         glfwGetCursorPos(window, &cursor_x, &cursor_y);
 
-        float normalized_cursor_x = (cursor_x/width) * 2.0f - 1.0f;
-        float normalized_cursor_y = 1.0f - (cursor_y/height) * 2.0f; // Invert y-axis
+        float normalized_cursor_x = (cursor_x / width) * 2.0f - 1.0f;
+        float normalized_cursor_y = 1.0f - (cursor_y / height) * 2.0f; // Invert y-axis
 
         int leftMouseButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 
-        //if (leftMouseButtonState == GLFW_PRESS) {... // to create continuous curves with little squares
+        //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create continuous curves with little squares
 
-        if (leftMouseButtonState == GLFW_PRESS  && prevMouseButtonState == GLFW_RELEASE) {
+        if (leftMouseButtonState == GLFW_PRESS) {
             left_button_normalized_x = normalized_cursor_x;
             left_button_normalized_y = normalized_cursor_y;
-            squares.push_back({left_button_normalized_x, left_button_normalized_y, initial_t});
+            Square sq(left_button_normalized_x, left_button_normalized_y, initial_t);
+            squares_array.push_back({sq.Get_pos_x(), sq.Get_pos_y(), sq.Get_t()});
             click = true;
         }
 
         prevMouseButtonState = leftMouseButtonState;
 
-        Draw_Square_on_cursor(ratio, VAO, VBO, square_side_length, normalized_cursor_x, normalized_cursor_y);
+        sq.Draw_Square_on_cursor(ratio, VAO, VBO, square_side_length, normalized_cursor_x, normalized_cursor_y);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-        for (auto& square : squares) {
-            square.t += deltaTime;
-            Draw_Square_Falling(ratio, VAO, VBO, square_side_length, square.pos_x, square.pos_y, square.t);
+        for (auto& square : squares_array) {
+            square.Set_t(square.Get_t()+deltaTime);
+            float norma_pos_x = square.Get_pos_x();
+            float norma_pos_y = square.Get_pos_y();
+            float t = square.Get_t();
+            sq.Draw_Square_Falling(ratio, VAO, VBO, square_side_length, norma_pos_x, norma_pos_y, t);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         }
 

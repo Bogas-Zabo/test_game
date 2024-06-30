@@ -10,7 +10,8 @@
                 "-std=c++17",
                 "-I${workspaceFolder}/include",
                 "-L${workspaceFolder}/lib",
-                "${workspaceFolder}/src/test.cpp",//<-- nome do ficheiro a executar o .c ou .cpp
+                "${workspaceFolder}/src/square.cpp",
+                "${workspaceFolder}/src/program.cpp",//<-- nome do ficheiro a executar o .c ou .cpp
                 "${workspaceFolder}/src/glad.c",//<-- usar glad.c para ficheiros sem #include <glad/gl.h>, tirar quando tem #include <glad/gl.h>
                 "-lglfw3dll",
                 "-o",
