@@ -2,6 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <other/Square.hpp>
+#include <other/Grid.hpp>
+#include <math.h>
 
 using namespace std;
 
@@ -111,8 +113,6 @@ int main() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    float square_side_length = 0.02;
-
     float left_button_normalized_x;
     float left_button_normalized_y;
 
@@ -122,8 +122,11 @@ int main() {
 
     double lastTime = glfwGetTime();
 
-    vector<Square> squares_array;
-    Square sq(0.0f,0.0f,0.0f);
+    float square_side_length = 0.02;
+    float gridSize = square_side_length/2;
+
+    Square sq(square_side_length, 0.0f,0.0f,0.0f);
+    Grid gr(gridSize);
 
     while (!glfwWindowShouldClose(window)) {
 
@@ -145,29 +148,32 @@ int main() {
         float normalized_cursor_x = (cursor_x / width) * 2.0f - 1.0f;
         float normalized_cursor_y = 1.0f - (cursor_y / height) * 2.0f; // Invert y-axis
 
+        float snapped_cursor_x = gr.Snap_To_Grid(normalized_cursor_x, gridSize);
+        float snapped_cursor_y = gr.Snap_To_Grid(normalized_cursor_y, gridSize);
+
         int leftMouseButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 
-        //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create continuous curves with little squares
+        //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create individual little squares
 
         if (leftMouseButtonState == GLFW_PRESS) {
-            left_button_normalized_x = normalized_cursor_x;
-            left_button_normalized_y = normalized_cursor_y;
-            Square sq(left_button_normalized_x, left_button_normalized_y, initial_t);
-            squares_array.push_back({sq.Get_pos_x(), sq.Get_pos_y(), sq.Get_t()});
+            left_button_normalized_x = snapped_cursor_x;
+            left_button_normalized_y = snapped_cursor_y;
+            Square sq(square_side_length, left_button_normalized_x, left_button_normalized_y, initial_t);
+            squares_array.push_back({square_side_length, sq.Get_pos_x(), sq.Get_pos_y(), sq.Get_t()});
             click = true;
         }
 
         prevMouseButtonState = leftMouseButtonState;
 
-        sq.Draw_Square_on_cursor(ratio, VAO, VBO, square_side_length, normalized_cursor_x, normalized_cursor_y);
+        sq.Draw_Square_on_cursor(ratio, VAO, VBO, snapped_cursor_x, snapped_cursor_y);
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
         for (auto& square : squares_array) {
-            square.Set_t(square.Get_t()+deltaTime);
+            square.Set_t(square.Get_t() + deltaTime*10);
             float norma_pos_x = square.Get_pos_x();
             float norma_pos_y = square.Get_pos_y();
             float t = square.Get_t();
-            sq.Draw_Square_Falling(ratio, VAO, VBO, square_side_length, norma_pos_x, norma_pos_y, t);
+            sq.Draw_Square_Falling(ratio, VAO, VBO, norma_pos_x, norma_pos_y, t);
             glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
         }
 

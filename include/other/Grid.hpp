@@ -7,9 +7,11 @@
 class Grid {
 
     public:
-        void Init(unsigned int width, unsigned int height);
-        void clear();
-        void set(unsigned int x, unsigned int y, unsigned int color);
-        void swap(unsigned int a, unsigned int b);
-        bool isEmpty(unsigned int index);
+        Grid(float grid_size);
+        void Set_Grid_size(float grid_size);
+        float Get_Grid_size();
+        float Snap_To_Grid(float value, float gridSize);
+
+    private:
+        float grid_size;
 };
