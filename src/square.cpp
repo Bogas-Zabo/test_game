@@ -7,8 +7,16 @@
 
 Square::Square(float side_length, float norma_pos_x, float norma_pos_y, float time) : square_side_length(side_length), pos_x(norma_pos_x), pos_y(norma_pos_y), t(time) {};
 
+void Square::Set_pos_x(float new_pos_x) {
+    pos_x = new_pos_x;
+}
+
 float Square::Get_pos_x() {
     return pos_x;
+}
+
+void Square::Set_pos_y(float new_pos_y) {
+    pos_y = new_pos_y;
 }
 
 float Square::Get_pos_y() {
@@ -26,17 +34,17 @@ float Square::Get_t() {
 void Square::Draw_Square_Falling(const float ratio, GLuint VAO, GLuint VBO, float& pos_x, float& pos_y, float& t) {
     float g = -0.01;
     float v = 0 + g*t;
-    Grid gr(square_side_length/2);
+    Grid gr(square_side_length);
 
     float vertex_point = square_side_length/2;
     float vertex_limit_point_x = 1 - (vertex_point/ratio);
     float vertex_limit_point_y = 1 - vertex_point;
 
-    float bottom_vertex_y = -vertex_point + gr.Snap_To_Grid(+ v*t + 1/2*g*t*t + pos_y, square_side_length/2);
-    float top_vertex_y = vertex_point + gr.Snap_To_Grid(v*t + 1/2*g*t*t + pos_y, square_side_length/2);
+    float bottom_vertex_y = -vertex_point + gr.Snap_To_Grid(v*t + 1/2*g*t*t + pos_y, square_side_length);
+    float top_vertex_y = vertex_point + gr.Snap_To_Grid(v*t + 1/2*g*t*t + pos_y, square_side_length);
 
-    float left_vertex_x = -vertex_point/ratio + gr.Snap_To_Grid(pos_x, square_side_length/2);
-    float right_vertex_x = vertex_point/ratio + gr.Snap_To_Grid(pos_x, square_side_length/2);
+    float left_vertex_x = -vertex_point/ratio + gr.Snap_To_Grid(pos_x, square_side_length/ratio);
+    float right_vertex_x = vertex_point/ratio + gr.Snap_To_Grid(pos_x, square_side_length/ratio);
 
     if (bottom_vertex_y <= -vertex_point-vertex_limit_point_y) {
         bottom_vertex_y = -vertex_point-vertex_limit_point_y;

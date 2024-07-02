@@ -5,7 +5,9 @@ class Square {
 
     public:
         Square(float square_side_length, float pos_x, float pos_y, float initial_t);
+        void Set_pos_x(float new_pos_x);
         float Get_pos_x();
+        void Set_pos_y(float new_pos_y);
         float Get_pos_y();
         void Set_t(float time);
         float Get_t();
