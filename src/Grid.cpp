@@ -33,18 +33,6 @@ vector<vector<int>> Grid::Initialize_grid(float ratio, float square_side_length)
     return grid_array;
 }
 
-vector<vector<int>> Grid::Put_square_on_grid(int square_type, vector<vector<int>> given_grid_array, int coord_x, int coord_y) {
-
-    int num_rows = given_grid_array.size();
-    int num_columns = given_grid_array.front().size();
-
-    // if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)&&(given_grid_array.at(coord_y).at(coord_x)!=2))
-    if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)) {
-        given_grid_array.at(coord_y).at(coord_x) = square_type;
-    }
-
-    return given_grid_array;
-}
 
 vector<vector<int>> Grid::Resize_grid(vector<vector<int>> given_grid_array, float ratio, float square_side_length) {
 

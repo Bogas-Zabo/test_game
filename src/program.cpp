@@ -174,11 +174,11 @@ int main() {
         if (leftMouseButtonState == GLFW_PRESS) {
             Square sq(square_side_length, grid_cursor_x, grid_cursor_y, initial_t, grid_cursor_y);
             squares_array.push_back(sq);
-            grid_array = gr.Put_square_on_grid(falling_square, grid_array, grid_cursor_x, grid_cursor_y);
+            grid_array = sq.Put_square_on_grid(falling_square, grid_array, grid_cursor_x, grid_cursor_y);
             click = true;
         }
         else {
-            grid_array = gr.Put_square_on_grid(cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
+            grid_array = sq.Put_square_on_grid(cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
         }
 
         prevMouseButtonState = leftMouseButtonState;
