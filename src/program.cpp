@@ -141,7 +141,7 @@ int main() {
     int falling_square = 2;
     int cursor_square = 1;
 
-    while (!glfwWindowShouldClose(window)) {;
+    while (!glfwWindowShouldClose(window)) {
 
         int width, height;
         glfwGetFramebufferSize(window, &width, &height);
@@ -151,7 +151,7 @@ int main() {
         const float actual_grid_ratio = grid_dimentions.first/(float)grid_dimentions.second;
 
         if (previous_grid_ratio!=actual_grid_ratio) {
-            grid_array = gr.Resize_grid(grid_array, actual_grid_ratio, square_side_length);
+            grid_array = gr.Resize_grid(grid_dimentions.first, grid_dimentions.second, grid_array, actual_grid_ratio, square_side_length);
             grid_dimentions.first = grid_array.front().size(); // columns
             grid_dimentions.second = grid_array.size(); // rows
             previous_grid_ratio=actual_grid_ratio;
@@ -174,18 +174,18 @@ int main() {
         if (leftMouseButtonState == GLFW_PRESS) {
             Square sq(square_side_length, grid_cursor_x, grid_cursor_y, initial_t, grid_cursor_y);
             squares_array.push_back(sq);
-            grid_array = sq.Put_square_on_grid(falling_square, grid_array, grid_cursor_x, grid_cursor_y);
+            grid_array = sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, falling_square, grid_array, grid_cursor_x, grid_cursor_y);
             click = true;
         }
         else {
-            grid_array = sq.Put_square_on_grid(cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
+            grid_array = sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
         }
 
         prevMouseButtonState = leftMouseButtonState;
         
         grid_array = sq.Update_falling_squares(grid_dimentions.first, grid_dimentions.second, grid_cursor_x, grid_cursor_y, grid_array, squares_array);
 
-        sq.Draw_square(grid_array, actual_grid_ratio, VAO, VBO);
+        sq.Draw_square(grid_dimentions.first, grid_dimentions.second, grid_array, actual_grid_ratio, VAO, VBO);
 
         glfwSwapBuffers(window);
         glfwPollEvents();

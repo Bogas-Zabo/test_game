@@ -34,10 +34,7 @@ vector<vector<int>> Grid::Initialize_grid(float ratio, float square_side_length)
 }
 
 
-vector<vector<int>> Grid::Resize_grid(vector<vector<int>> given_grid_array, float ratio, float square_side_length) {
-
-    int num_rows = given_grid_array.size();
-    int num_columns = given_grid_array.front().size();
+vector<vector<int>> Grid::Resize_grid(int num_columns, int num_rows, vector<vector<int>> given_grid_array, float ratio, float square_side_length) {
 
     int updated_num_rows = num_rows;
     int updated_num_columns = (int)(num_columns*ratio);

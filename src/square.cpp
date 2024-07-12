@@ -39,10 +39,7 @@ int Square::Get_falling_pos_y() {
     return falling_pos_y;
 }
 
-vector<vector<int>> Square::Put_square_on_grid(int square_type, vector<vector<int>> given_grid_array, int coord_x, int coord_y) {
-
-    int num_rows = given_grid_array.size();
-    int num_columns = given_grid_array.front().size();
+vector<vector<int>> Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, vector<vector<int>> given_grid_array, int coord_x, int coord_y) {
 
     // if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)&&(given_grid_array.at(coord_y).at(coord_x)!=2))
     if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)) {
@@ -54,8 +51,8 @@ vector<vector<int>> Square::Put_square_on_grid(int square_type, vector<vector<in
 
 vector<vector<int>> Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<int>> given_grid_array, vector<Square>& given_squares_array) {
 
-    float num_columns = given_grid_array.front().size(); // columns
-    float num_rows = given_grid_array.size(); // rows
+    float num_columns = pos_x_limit; // columns
+    float num_rows = pos_y_limit; // rows
     float g = 9.81/3;
 
     for (int y = 0; y<num_rows; y++) {
@@ -106,26 +103,21 @@ vector<vector<int>> Square::Update_falling_squares(int pos_x_limit, int pos_y_li
             }
             else if ((given_grid_array.at(future_falling_pos_y).at(pos_x+1)==2)&&(given_grid_array.at(future_falling_pos_y).at(pos_x-1)==2)) {
                 given_grid_array.at(future_falling_pos_y-1).at(pos_x) = 2;
-                square.Set_pos_x(pos_x);
                 square.Set_falling_pos_y(future_falling_pos_y-1);
             }
         }
         else {
             given_grid_array.at(future_falling_pos_y).at(pos_x) = 2;
             square.Set_falling_pos_y(future_falling_pos_y);
-            square.Set_pos_x(pos_x);
         }
     }
 
     return given_grid_array;
 }
 
-void Square::Draw_square(vector<vector<int>> given_grid_array, const float ratio, GLuint VAO, GLuint VBO) {
+void Square::Draw_square(int num_columns, int num_rows, vector<vector<int>> given_grid_array, const float ratio, GLuint VAO, GLuint VBO) {
 
     float vertex_point = square_side_length/2;
-
-    int num_rows = given_grid_array.size();
-    int num_columns = given_grid_array.front().size();
 
     for (int y = 0; y<num_rows; y++) {
         for (int x = 0; x<num_columns; x++) {
