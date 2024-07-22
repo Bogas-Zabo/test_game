@@ -39,85 +39,74 @@ int Square::Get_falling_pos_y() {
     return falling_pos_y;
 }
 
-vector<vector<int>> Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, vector<vector<int>> given_grid_array, int coord_x, int coord_y) {
+void Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, vector<vector<int>>& given_grid_array, int coord_x, int coord_y) {
 
-    // if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)&&(given_grid_array.at(coord_y).at(coord_x)!=2))
-    if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)) {
+    // if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)) // to erase squares with cursor
+    if ((coord_x<num_columns-1)&&(coord_y<num_rows)&&(coord_x>=1)&&(coord_y>=0)&&(given_grid_array.at(coord_y).at(coord_x)!=2)) {
         given_grid_array.at(coord_y).at(coord_x) = square_type;
     }
-
-    return given_grid_array;
 }
 
-vector<vector<int>> Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<int>> given_grid_array, vector<Square>& given_squares_array) {
+void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<int>>& given_grid_array) {
 
-    float num_columns = pos_x_limit; // columns
-    float num_rows = pos_y_limit; // rows
+    int num_columns = pos_x_limit; // columns
+    int num_rows = pos_y_limit; // rows
     float g = 9.81/3;
 
-    for (int y = 0; y<num_rows; y++) {
-        for (int x = 0; x<num_columns; x++) {
-            if ((given_grid_array.at(y).at(x)==1)&&((x!=grid_cursor_x)||(y!=grid_cursor_y))) {
+    for (int y = num_rows-1; y>=0; y--) { // from bottom to top
+        for (int x = 0; x<num_columns; x++) { // from left to right
+
+            if ((given_grid_array.at(y).at(x)==1)&&((x!=grid_cursor_x)||(y!=grid_cursor_y))) { // cursor square
                 given_grid_array.at(y).at(x) = 0;
             }
-            if (given_grid_array.at(y).at(x)!=1) {
-                given_grid_array.at(y).at(x) = 0;
+
+            if (given_grid_array.at(y).at(x)==2) { // falling square
+
+                int future_falling_pos_y = y+1;
+                int new_pos_x = x;
+
+                if (future_falling_pos_y >= pos_y_limit) {
+                    future_falling_pos_y = pos_y_limit-1;
+                }
+
+                if (future_falling_pos_y < 0) {
+                    future_falling_pos_y = 0;
+                }
+                                    
+                if (new_pos_x+1 >= pos_x_limit) {
+                    new_pos_x = pos_x_limit-2;    
+                }
+
+                if (new_pos_x-1 <= 0) {
+                    new_pos_x = 1;    
+                }
+
+                given_grid_array.at(y).at(new_pos_x) = 0;
+                
+                if (given_grid_array.at(future_falling_pos_y).at(new_pos_x)==2) {
+
+                    if (given_grid_array.at(future_falling_pos_y).at(new_pos_x+1)==0) {
+                        given_grid_array.at(future_falling_pos_y).at(new_pos_x+1) = 2;
+                    }
+                    else if (given_grid_array.at(future_falling_pos_y).at(new_pos_x-1)==0) {
+                        given_grid_array.at(future_falling_pos_y).at(new_pos_x-1) = 2;
+                    }
+                    else if ((given_grid_array.at(future_falling_pos_y).at(new_pos_x+1)==2)&&(given_grid_array.at(future_falling_pos_y).at(new_pos_x-1)==2)) {
+                        given_grid_array.at(y).at(new_pos_x) = 2;
+                    }
+                }
+                else {
+                    given_grid_array.at(future_falling_pos_y).at(new_pos_x) = 2;
+                }
             }
         }
     }
-
-    for (auto& square : given_squares_array) {
-
-        int pos_x = square.Get_pos_x();
-        //int pos_y = square.Get_pos_y();
-
-        int falling_pos_y = square.Get_falling_pos_y();
-        
-        int future_falling_pos_y = falling_pos_y+1;
-
-        if (future_falling_pos_y >= pos_y_limit) {
-            future_falling_pos_y = pos_y_limit-1;
-        }
-
-        if (future_falling_pos_y < 0) {
-            future_falling_pos_y = 0;
-        }
-
-        if (pos_x+1 >= pos_x_limit) {
-            pos_x = pos_x_limit-2;    
-        }
-
-        if (pos_x <= 0) {
-            pos_x = 1;    
-        }
-
-        if (given_grid_array.at(future_falling_pos_y).at(pos_x)==2) {
-
-            if (given_grid_array.at(future_falling_pos_y).at(pos_x+1)==0) {
-                given_grid_array.at(future_falling_pos_y).at(pos_x+1) = 2;
-                square.Set_pos_x(pos_x+1);
-            }
-            else if (given_grid_array.at(future_falling_pos_y).at(pos_x-1)==0) {
-                given_grid_array.at(future_falling_pos_y).at(pos_x-1) = 2;
-                square.Set_pos_x(pos_x-1);
-            }
-            else if ((given_grid_array.at(future_falling_pos_y).at(pos_x+1)==2)&&(given_grid_array.at(future_falling_pos_y).at(pos_x-1)==2)) {
-                given_grid_array.at(future_falling_pos_y-1).at(pos_x) = 2;
-                square.Set_falling_pos_y(future_falling_pos_y-1);
-            }
-        }
-        else {
-            given_grid_array.at(future_falling_pos_y).at(pos_x) = 2;
-            square.Set_falling_pos_y(future_falling_pos_y);
-        }
-    }
-
-    return given_grid_array;
 }
 
-void Square::Draw_square(int num_columns, int num_rows, vector<vector<int>> given_grid_array, const float ratio, GLuint VAO, GLuint VBO) {
+void Square::Draw_square(int num_columns, int num_rows, vector<vector<int>>& given_grid_array, const float ratio, GLuint VAO, GLuint VBO) {
 
     float vertex_point = square_side_length/2;
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
     for (int y = 0; y<num_rows; y++) {
         for (int x = 0; x<num_columns; x++) {
@@ -134,7 +123,6 @@ void Square::Draw_square(int num_columns, int num_rows, vector<vector<int>> give
                 };
 
                 glBindVertexArray(VAO);
-                glBindBuffer(GL_ARRAY_BUFFER, VBO);
                 glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
                 glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
             }

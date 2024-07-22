@@ -9,7 +9,6 @@ using namespace std;
 
 static double cursor_x;
 static double cursor_y;
-vector<Square> squares_array;
 
 const char* vertexShaderSource = R"(
 #version 330 core
@@ -71,6 +70,25 @@ GLuint create_Shader_Program() {
     return shaderProgram;
 }
 
+double lastTime = 0.0;
+int frameCount = 0;
+
+// Function to calculate and display FPS
+void calculateAndDisplayFPS(GLFWwindow* window) {
+    double currentTime = glfwGetTime();
+    double deltaTime = currentTime - lastTime;
+    frameCount++;
+
+    if (deltaTime >= 0.05) { // Update every second
+        double fps = frameCount / deltaTime;
+        std::string title = "Falling particles game | FPS: " + std::to_string(fps);
+        glfwSetWindowTitle(window, title.c_str());
+
+        frameCount = 0;
+        lastTime = currentTime;
+    }
+}
+
 int main() {
     if (!glfwInit()) {
         cout << "Failed to initialize GLFW" << endl;
@@ -120,7 +138,7 @@ int main() {
     int prevMouseButtonState = GLFW_RELEASE;
     float initial_t = 0.0f;
 
-    float square_side_length = 0.02;
+    float square_side_length = 0.01;
     float gridSize = square_side_length;
 
     int width, height;
@@ -143,11 +161,10 @@ int main() {
 
     while (!glfwWindowShouldClose(window)) {
 
-        int width, height;
+        calculateAndDisplayFPS(window);      
+
         glfwGetFramebufferSize(window, &width, &height);
 
-        grid_dimentions.first = grid_array.front().size(); // columns
-        grid_dimentions.second = grid_array.size(); // rows
         const float actual_grid_ratio = grid_dimentions.first/(float)grid_dimentions.second;
 
         if (previous_grid_ratio!=actual_grid_ratio) {
@@ -172,18 +189,16 @@ int main() {
         //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create individual little squares
 
         if (leftMouseButtonState == GLFW_PRESS) {
-            Square sq(square_side_length, grid_cursor_x, grid_cursor_y, initial_t, grid_cursor_y);
-            squares_array.push_back(sq);
-            grid_array = sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, falling_square, grid_array, grid_cursor_x, grid_cursor_y);
+            sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, falling_square, grid_array, grid_cursor_x, grid_cursor_y);
             click = true;
         }
         else {
-            grid_array = sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
+            sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, cursor_square, grid_array, grid_cursor_x, grid_cursor_y);
         }
 
         prevMouseButtonState = leftMouseButtonState;
         
-        grid_array = sq.Update_falling_squares(grid_dimentions.first, grid_dimentions.second, grid_cursor_x, grid_cursor_y, grid_array, squares_array);
+        sq.Update_falling_squares(grid_dimentions.first, grid_dimentions.second, grid_cursor_x, grid_cursor_y, grid_array);
 
         sq.Draw_square(grid_dimentions.first, grid_dimentions.second, grid_array, actual_grid_ratio, VAO, VBO);
 

@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <math.h>
+using namespace std;
 
 Grid::Grid(float size) : grid_size(size) {};
 
