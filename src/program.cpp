@@ -81,7 +81,7 @@ void calculateAndDisplayFPS(GLFWwindow* window) {
 
     if (deltaTime >= 0.05) { // Update every second
         int fps = (int)(frameCount/deltaTime);
-        std::string title = "Falling particles game | FPS: " + std::to_string(fps);
+        string title = "Falling particles game | FPS: " + to_string(fps);
         glfwSetWindowTitle(window, title.c_str());
 
         frameCount = 0;
