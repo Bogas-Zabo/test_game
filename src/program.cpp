@@ -80,7 +80,7 @@ void calculateAndDisplayFPS(GLFWwindow* window) {
     frameCount++;
 
     if (deltaTime >= 0.05) { // Update every second
-        double fps = frameCount / deltaTime;
+        int fps = (int)(frameCount/deltaTime);
         std::string title = "Falling particles game | FPS: " + std::to_string(fps);
         glfwSetWindowTitle(window, title.c_str());
 
@@ -138,17 +138,17 @@ int main() {
     int prevMouseButtonState = GLFW_RELEASE;
     float initial_t = 0.0f;
 
-    float square_side_length = 0.01;
+    float square_side_length = 0.02;
     float gridSize = square_side_length;
 
     int width, height;
     glfwGetFramebufferSize(window, &width, &height);
     float window_ratio = width / (float)height;
 
-    Square sq(square_side_length, 0.0f,0.0f,0.0f,0);
+    Square sq(square_side_length, 0, 0, 0.0f, 0);
     Grid gr(gridSize);
 
-    vector<vector<int>> grid_array = gr.Initialize_grid(window_ratio, square_side_length);
+    vector<vector<Square>> grid_array = gr.Initialize_grid(window_ratio, square_side_length);
 
     pair<int, int> grid_dimentions;
 
@@ -161,9 +161,14 @@ int main() {
 
     while (!glfwWindowShouldClose(window)) {
 
+        glClear(GL_COLOR_BUFFER_BIT);
+        glUseProgram(shaderProgram);
+
         calculateAndDisplayFPS(window);      
 
         glfwGetFramebufferSize(window, &width, &height);
+
+        glViewport(0, 0, width, height);
 
         const float actual_grid_ratio = grid_dimentions.first/(float)grid_dimentions.second;
 
@@ -173,11 +178,6 @@ int main() {
             grid_dimentions.second = grid_array.size(); // rows
             previous_grid_ratio=actual_grid_ratio;
         }
-
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-
-        glUseProgram(shaderProgram);
 
         glfwGetCursorPos(window, &cursor_x, &cursor_y);
 
@@ -189,6 +189,7 @@ int main() {
         //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create individual little squares
 
         if (leftMouseButtonState == GLFW_PRESS) {
+        //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {
             sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, falling_square, grid_array, grid_cursor_x, grid_cursor_y);
             click = true;
         }
