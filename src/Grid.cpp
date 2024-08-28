@@ -25,7 +25,7 @@ vector<vector<Square>> Grid::Initialize_grid(float ratio, float square_side_leng
     for (int y = 0; y<num_rows; y++) {
         vector<Square> row_array;
         for (int x = 0; x<num_columns; x++) {
-            Square square(square_side_length, 0, 0, 0.0f, 0);
+            Square square(square_side_length, 0, 0, 0.0f, 0, false);
             //int x_value = 0;
             row_array.push_back(square);
         }

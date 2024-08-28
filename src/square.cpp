@@ -5,8 +5,8 @@
 #include <vector>
 using namespace std;
 
-Square::Square(float side_length, int norma_pos_x, int norma_pos_y, float time, int particle) : 
-square_side_length(side_length), pos_x(norma_pos_x), pos_y(norma_pos_y), t(time), type(particle) {};
+Square::Square(float side_length, int norma_pos_x, int norma_pos_y, float time, int particle, bool state) : 
+square_side_length(side_length), pos_x(norma_pos_x), pos_y(norma_pos_y), t(time), type(particle) , is_stationary(state) {};
 
 void Square::Set_pos_x(int new_pos_x) {
     pos_x = new_pos_x;
@@ -40,6 +40,14 @@ int Square::Get_type() {
     return type;
 }
 
+void Square::Set_is_stationary(bool state) {
+    is_stationary = state;
+}
+
+int Square::Get_is_stationary() {
+    return is_stationary;
+}
+
 void Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, vector<vector<Square>>& given_grid_array, int coord_x, int coord_y) {
 
     // if ((coord_x<num_columns)&&(coord_y<num_rows)&&(coord_x>=0)&&(coord_y>=0)) // to erase squares with cursor
@@ -47,17 +55,16 @@ void Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, 
         given_grid_array[coord_y][coord_x].Set_type(square_type);
         //given_grid_array[coord_y][coord_x].Set_pos_y(coord_y);
         //given_grid_array[coord_y][coord_x].Set_pos_x(coord_x);
-        //given_grid_array[coord_y][coord_x].Set_t(0);
+        //given_grid_array[coord_y][coord_x].Set_t(0.0f);
+        //given_grid_array[coord_y][coord_x].Set_is_stationary(false);
     }
 }
+
 
 void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<Square>>& given_grid_array) {
 
     int num_columns = pos_x_limit; // columns
     int num_rows = pos_y_limit; // rows
-
-    float g = 9.81;
-    float delta_t = 0.016;
 
     for (int y = num_rows-1; y>=0; y--) { // from bottom to top
 
@@ -98,6 +105,7 @@ void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_c
     }
 }
 
+
 /*
 void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<Square>>& given_grid_array) {
 
@@ -107,7 +115,14 @@ void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_c
     float g = 9.81;
     float delta_t = 0.016;
 
+    //vector<vector<int>> max_y_pos_array;
+    //int max_y = 0;
+    int* max_y_pos_array = static_cast<int*>(malloc(pos_x_limit*sizeof(int)));
+    //int count = 0;
+
     for (int y = num_rows-1; y>=0; y--) { // from bottom to top
+
+        //int count = 0;
 
         for (int x = 0; x<num_columns; x++) { // from left to right
 
@@ -115,16 +130,26 @@ void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_c
                 given_grid_array[y][x].Set_type(0);
             }
 
+            max_y_pos_array[x] = pos_y_limit;
+
             if (given_grid_array[y][x].Get_type()==2) { // falling square
 
+                if (given_grid_array[y][x].Get_is_stationary()) {
+                    max_y_pos_array[x] = y;
+                }
+
+                //given_grid_array[y][x].Set_t(given_grid_array[y][x].Get_t()+delta_t);
                 float t = given_grid_array[y][x].Get_t();
                 int pos_y = given_grid_array[y][x].Get_pos_y();
 
                 int new_pos_x = x;
+                //int new_pos_x = given_grid_array[y][x].Get_pos_x();
                 int left_new_pos_x = new_pos_x-1;
                 int right_new_pos_x = new_pos_x+1;
 
+                //float future_t = given_grid_array[y][x].Get_t();
                 float future_t = t + delta_t;
+
 
                 float v = 0 + g*future_t;
 
@@ -135,36 +160,53 @@ void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_c
 
                 if ((future_pos_y < pos_y_limit)&&(future_pos_y >= 0)&&(right_new_pos_x < pos_x_limit)&&(left_new_pos_x >= 0)) {
 
-                    if (given_grid_array[future_pos_y][new_pos_x].Get_type()==2) {
+                    if ((given_grid_array[future_pos_y][new_pos_x].Get_type()==2)&&(future_pos_y!=pos_y)) {
 
-                            if (given_grid_array[future_pos_y][left_new_pos_x].Get_type()==0) {
-                                given_grid_array[y][new_pos_x].Set_type(0);
-                                given_grid_array[y][new_pos_x].Set_pos_y(0);
-                                given_grid_array[future_pos_y][left_new_pos_x].Set_type(2);
-                                given_grid_array[future_pos_y][left_new_pos_x].Set_t(future_t);
-                                given_grid_array[future_pos_y][left_new_pos_x].Set_pos_y(pos_y);
-                            }
-                            else if (given_grid_array[future_pos_y][right_new_pos_x].Get_type()==0) {
-                                given_grid_array[y][new_pos_x].Set_type(0);
-                                given_grid_array[y][new_pos_x].Set_pos_y(0);
-                                given_grid_array[future_pos_y][right_new_pos_x].Set_type(2);
-                                given_grid_array[future_pos_y][right_new_pos_x].Set_t(future_t);
-                                given_grid_array[future_pos_y][right_new_pos_x].Set_pos_y(pos_y);
-                            }                
+                        
+                        if ((given_grid_array[future_pos_y][left_new_pos_x].Get_type()==0)&&(given_grid_array[future_pos_y][right_new_pos_x].Get_type()==0)) {
+                            given_grid_array[y][new_pos_x].Set_type(0);
+                            given_grid_array[y][new_pos_x].Set_pos_y(0);
+                            given_grid_array[future_pos_y][new_pos_x].Set_type(2);
+                            given_grid_array[future_pos_y][new_pos_x].Set_t(future_t);
+                            given_grid_array[future_pos_y][new_pos_x].Set_pos_y(pos_y);
+                            //given_grid_array[future_pos_y][new_pos_x].Set_pos_x(new_pos_x);
+                            given_grid_array[future_pos_y][new_pos_x].Set_is_stationary(false);
+                        }                  
+                        else if (given_grid_array[future_pos_y][left_new_pos_x].Get_type()==0) {
+                            given_grid_array[y][new_pos_x].Set_type(0);
+                            given_grid_array[y][new_pos_x].Set_pos_y(0);
+                            given_grid_array[future_pos_y][left_new_pos_x].Set_type(2);
+                            given_grid_array[future_pos_y][left_new_pos_x].Set_t(future_t);
+                            given_grid_array[future_pos_y][left_new_pos_x].Set_pos_y(pos_y);
+                            //given_grid_array[future_pos_y][left_new_pos_x].Set_pos_x(left_new_pos_x);
+                            given_grid_array[future_pos_y][left_new_pos_x].Set_is_stationary(true);
+                        } 
+                        else if (given_grid_array[future_pos_y][right_new_pos_x].Get_type()==0) {
+                            given_grid_array[y][new_pos_x].Set_type(0);
+                            given_grid_array[y][new_pos_x].Set_pos_y(0);
+                            given_grid_array[future_pos_y][right_new_pos_x].Set_type(2);
+                            given_grid_array[future_pos_y][right_new_pos_x].Set_t(future_t);
+                            given_grid_array[future_pos_y][right_new_pos_x].Set_pos_y(pos_y);
+                            //given_grid_array[future_pos_y][right_new_pos_x].Set_pos_x(right_new_pos_x);
+                            given_grid_array[future_pos_y][right_new_pos_x].Set_is_stationary(true);
+                        }  
                     }
                     else {
+                        //printf("max_y: %d, x: %d\n", max_y_pos_array[x], x);
                         given_grid_array[y][new_pos_x].Set_type(0);
                         given_grid_array[y][new_pos_x].Set_pos_y(0);
                         given_grid_array[future_pos_y][new_pos_x].Set_type(2);
                         given_grid_array[future_pos_y][new_pos_x].Set_t(future_t);
                         given_grid_array[future_pos_y][new_pos_x].Set_pos_y(pos_y);
+                        //given_grid_array[future_pos_y][new_pos_x].Set_pos_x(new_pos_x);
+                        given_grid_array[future_pos_y][new_pos_x].Set_is_stationary(false);
                     }
-                //given_grid_array[future_pos_y][new_pos_x].Set_t(future_t);
-                //printf("time square: %.2f\n", t);
                 }
             }
         }
+        //max_y_pos_array.push_back(highest_y_pos_in_x);
     }
+    free(max_y_pos_array);
 }
 */
 

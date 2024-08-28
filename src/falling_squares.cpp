@@ -4,6 +4,7 @@
 #include <other/Square.hpp>
 #include <other/Grid.hpp>
 #include <math.h>
+#include <string>
 
 using namespace std;
 
@@ -73,13 +74,12 @@ GLuint create_Shader_Program() {
 double lastTime = 0.0;
 int frameCount = 0;
 
-// Function to calculate and display FPS
 void calculateAndDisplayFPS(GLFWwindow* window) {
     double currentTime = glfwGetTime();
     double deltaTime = currentTime - lastTime;
     frameCount++;
 
-    if (deltaTime >= 0.05) { // Update every second
+    if (deltaTime >= 0.05) { // Update every 0.05 seconds
         int fps = (int)(frameCount/deltaTime);
         string title = "Falling particles game | FPS: " + to_string(fps);
         glfwSetWindowTitle(window, title.c_str());
@@ -145,7 +145,7 @@ int main() {
     glfwGetFramebufferSize(window, &width, &height);
     float window_ratio = width / (float)height;
 
-    Square sq(square_side_length, 0, 0, 0.0f, 0);
+    Square sq(square_side_length, 0, 0, 0.0f, 0, false);
     Grid gr(gridSize);
 
     vector<vector<Square>> grid_array = gr.Initialize_grid(window_ratio, square_side_length);

@@ -49,7 +49,9 @@
         "streambuf": "cpp",
         "cinttypes": "cpp",
         "typeinfo": "cpp",
-        "cfloat": "cpp"
+        "cfloat": "cpp",
+        "xutility": "cpp",
+        "xstring": "cpp"
     },
     "cmake.sourceDirectory": "C:/Users/igorz/Desktop/test_game/src"
 }

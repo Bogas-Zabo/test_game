@@ -12,7 +12,7 @@
                 "-L${workspaceFolder}/lib",
                 "${workspaceFolder}/src/square.cpp",
                 "${workspaceFolder}/src/grid.cpp",
-                "${workspaceFolder}/src/program.cpp",//<-- nome do ficheiro a executar o .c ou .cpp
+                "${workspaceFolder}/src/falling_squares.cpp",//<-- nome do ficheiro a executar o .c ou .cpp
                 "${workspaceFolder}/src/glad.c",//<-- usar glad.c para ficheiros sem #include <glad/gl.h>, tirar quando tem #include <glad/gl.h>
                 "-lglfw3dll",
                 "-o",
