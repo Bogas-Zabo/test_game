@@ -145,7 +145,7 @@ int main() {
     glfwGetFramebufferSize(window, &width, &height);
     float window_ratio = width / (float)height;
 
-    Square sq(square_side_length, 0, 0, 0.0f, 0, false);
+    Square sq(square_side_length, 0, 0.0f, 0);
     Grid gr(gridSize);
 
     vector<vector<Square>> grid_array = gr.Initialize_grid(window_ratio, square_side_length);
