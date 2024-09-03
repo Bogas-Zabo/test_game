@@ -74,7 +74,7 @@ GLuint create_Shader_Program() {
 double lastTime = 0.0;
 int frameCount = 0;
 
-void calculateAndDisplayFPS(GLFWwindow* window) {
+void calculate_and_display_FPS(GLFWwindow* window) {
     double currentTime = glfwGetTime();
     double deltaTime = currentTime - lastTime;
     frameCount++;
@@ -100,6 +100,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+    //GLFWwindow* window = glfwCreateWindow(1920, 1080, "window", glfwGetPrimaryMonitor(), NULL);
     GLFWwindow* window = glfwCreateWindow(800, 600, "window", NULL, NULL);
 
     if (window == NULL) {
@@ -164,7 +165,7 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram);
 
-        calculateAndDisplayFPS(window);      
+        calculate_and_display_FPS(window);      
 
         glfwGetFramebufferSize(window, &width, &height);
 
@@ -185,13 +186,17 @@ int main() {
         int grid_cursor_y = (int)(grid_dimentions.second*cursor_y/height);
 
         int leftMouseButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+        int rightMouseButtonState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT);
 
         //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {... // to create individual little squares
 
         if (leftMouseButtonState == GLFW_PRESS) {
         //if (leftMouseButtonState == GLFW_PRESS && prevMouseButtonState == GLFW_RELEASE) {
             sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, falling_square, grid_array, grid_cursor_x, grid_cursor_y);
-            click = true;
+            //click = true;
+        }
+        if (rightMouseButtonState == GLFW_PRESS) {
+            sq.Erase_square_from_grid(grid_dimentions.first, grid_dimentions.second, grid_array, grid_cursor_x, grid_cursor_y);
         }
         else {
             sq.Put_square_on_grid(grid_dimentions.first, grid_dimentions.second, cursor_square, grid_array, grid_cursor_x, grid_cursor_y);

@@ -51,7 +51,8 @@
         "typeinfo": "cpp",
         "cfloat": "cpp",
         "xutility": "cpp",
-        "xstring": "cpp"
+        "xstring": "cpp",
+        "thread": "cpp"
     },
     "cmake.sourceDirectory": "C:/Users/igorz/Desktop/test_game/src"
 }

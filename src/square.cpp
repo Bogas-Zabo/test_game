@@ -42,6 +42,15 @@ void Square::Put_square_on_grid(int num_columns, int num_rows, int square_type, 
     }
 }
 
+void Square::Erase_square_from_grid(int num_columns, int num_rows, vector<vector<Square>>& given_grid_array, int coord_x, int coord_y) {
+
+    if ((coord_x<num_columns-1)&&(coord_y<num_rows)&&(coord_x>0)&&(coord_y>=0)&&(given_grid_array[coord_y][coord_x].Get_type()==2)) {
+        given_grid_array[coord_y][coord_x].Set_type(0);
+        given_grid_array[coord_y][coord_x].Set_pos_y(0);
+        given_grid_array[coord_y][coord_x].Set_t(0.0f);
+    }
+}
+
 /*
 void Square::Update_falling_squares(int pos_x_limit, int pos_y_limit, int grid_cursor_x, int grid_cursor_y, vector<vector<Square>>& given_grid_array) {
 
